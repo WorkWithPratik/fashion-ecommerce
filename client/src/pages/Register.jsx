@@ -41,24 +41,6 @@ export default function Register() {
     }
   }
 
-  const Field = ({ name, label, icon: Icon, type = 'text', placeholder, extra }) => (
-    <div>
-      <label className="block text-xs font-semibold uppercase tracking-widest text-gray-600 mb-1.5">{label}</label>
-      <div className="relative">
-        <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-        <input
-          type={type}
-          value={formData[name]}
-          onChange={e => { setFormData(p => ({...p, [name]: e.target.value})); setErrors(p => ({...p, [name]: ''})) }}
-          placeholder={placeholder}
-          className={`w-full pl-9 ${extra ? 'pr-11' : 'pr-4'} py-3 border text-sm focus:outline-none focus:border-accent transition-colors ${errors[name] ? 'border-red-400' : 'border-gray-200'}`}
-        />
-        {extra}
-      </div>
-      {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]}</p>}
-    </div>
-  )
-
   return (
     <div className="pt-[88px] min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
@@ -73,15 +55,62 @@ export default function Register() {
 
         <div className="bg-white p-8 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-            <Field name="name" label="Full Name" icon={User} placeholder="Your full name" />
-            <Field name="email" label="Email" icon={Mail} type="email" placeholder="your@email.com" />
-            <Field
-              name="password"
-              label="Password"
-              icon={Lock}
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Min 6 characters"
-              extra={
+            {/* Full Name */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Full Name</label>
+              <div className="relative">
+                <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={e => {
+                    const val = e.target.value
+                    setFormData(p => ({ ...p, name: val }))
+                    setErrors(p => ({ ...p, name: '' }))
+                  }}
+                  placeholder="Your full name"
+                  className={`w-full pl-9 pr-4 py-3 border text-sm focus:outline-none focus:border-accent transition-colors ${errors.name ? 'border-red-400' : 'border-gray-200'}`}
+                />
+              </div>
+              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Email</label>
+              <div className="relative">
+                <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={e => {
+                    const val = e.target.value
+                    setFormData(p => ({ ...p, email: val }))
+                    setErrors(p => ({ ...p, email: '' }))
+                  }}
+                  placeholder="your@email.com"
+                  className={`w-full pl-9 pr-4 py-3 border text-sm focus:outline-none focus:border-accent transition-colors ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
+                />
+              </div>
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Password</label>
+              <div className="relative">
+                <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={e => {
+                    const val = e.target.value
+                    setFormData(p => ({ ...p, password: val }))
+                    setErrors(p => ({ ...p, password: '' }))
+                  }}
+                  placeholder="Min 6 characters"
+                  className={`w-full pl-9 pr-11 py-3 border text-sm focus:outline-none focus:border-accent transition-colors ${errors.password ? 'border-red-400' : 'border-gray-200'}`}
+                />
                 <button
                   type="button"
                   onClick={() => setShowPassword(s => !s)}
@@ -89,15 +118,29 @@ export default function Register() {
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
-              }
-            />
-            <Field
-              name="confirmPassword"
-              label="Confirm Password"
-              icon={Lock}
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Repeat your password"
-            />
+              </div>
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Confirm Password</label>
+              <div className="relative">
+                <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.confirmPassword}
+                  onChange={e => {
+                    const val = e.target.value
+                    setFormData(p => ({ ...p, confirmPassword: val }))
+                    setErrors(p => ({ ...p, confirmPassword: '' }))
+                  }}
+                  placeholder="Repeat your password"
+                  className={`w-full pl-9 pr-4 py-3 border text-sm focus:outline-none focus:border-accent transition-colors ${errors.confirmPassword ? 'border-red-400' : 'border-gray-200'}`}
+                />
+              </div>
+              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+            </div>
 
             <button
               type="submit"

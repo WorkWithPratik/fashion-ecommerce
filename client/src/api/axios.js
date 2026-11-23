@@ -1,7 +1,16 @@
 import axios from 'axios';
 
-const apiBase = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
-const api = axios.create({ baseURL: apiBase });
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return `${import.meta.env.VITE_API_URL}/api`;
+  }
+  if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+    return 'https://fashion-ecommerce-api.onrender.com/api';
+  }
+  return '/api';
+};
+
+const api = axios.create({ baseURL: getBaseURL() });
 
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
@@ -14,7 +23,6 @@ api.interceptors.response.use(
   error => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

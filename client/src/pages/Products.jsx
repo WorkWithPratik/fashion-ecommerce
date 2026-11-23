@@ -42,7 +42,8 @@ export default function Products() {
   const fetchCategories = async () => {
     try {
       const { data } = await api.get('/products/categories')
-      setCategories(data.categories || [])
+      const list = Array.isArray(data) ? data : (data.categories || [])
+      setCategories(list)
     } catch { setCategories([]) }
   }
 

@@ -24,7 +24,8 @@ export default function AdminCategories() {
     setLoading(true)
     try {
       const { data } = await api.get('/admin/categories')
-      setCategories(data.categories || [])
+      const catList = Array.isArray(data) ? data : (data.categories || [])
+      setCategories(catList)
     } catch { toast.error('Failed to load categories') }
     finally { setLoading(false) }
   }

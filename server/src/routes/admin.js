@@ -275,7 +275,7 @@ router.get('/categories', async (req, res) => {
       orderBy: { name: 'asc' },
     });
 
-    return res.json(categories);
+    return res.json({ categories });
   } catch (error) {
     console.error('Get categories error:', error);
     return res.status(500).json({ message: 'Internal server error.' });

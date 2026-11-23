@@ -32,10 +32,11 @@ export default function AdminProducts() {
     try {
       const [prodRes, catRes] = await Promise.all([
         api.get('/admin/products'),
-        api.get('/products/categories'),
+        api.get('/admin/categories'),
       ])
       setProducts(prodRes.data.products || [])
-      setCategories(catRes.data.categories || [])
+      const catList = Array.isArray(catRes.data) ? catRes.data : (catRes.data.categories || [])
+      setCategories(catList)
     } catch { toast.error('Failed to load data') }
     finally { setLoading(false) }
   }

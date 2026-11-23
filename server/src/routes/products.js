@@ -67,6 +67,19 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /api/products/categories
+router.get('/categories', async (_req, res) => {
+  try {
+    const categories = await prisma.category.findMany({
+      orderBy: { name: 'asc' },
+    });
+    return res.json({ categories });
+  } catch (error) {
+    console.error('Get categories error:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+});
+
 // GET /api/products/:id
 router.get('/:id', async (req, res) => {
   try {

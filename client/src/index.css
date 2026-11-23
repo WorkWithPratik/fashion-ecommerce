@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #fafaf9;
+    color: #1a1a1a;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #c8a97e;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #b8935a;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-accent px-6 py-3 font-semibold tracking-wide transition-all duration-300 ease-in-out hover:bg-primary-light hover:shadow-lg;
+  }
+
+  .btn-secondary {
+    @apply border border-primary text-primary px-6 py-3 font-semibold tracking-wide transition-all duration-300 ease-in-out hover:bg-primary hover:text-accent;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-primary px-6 py-3 font-semibold tracking-wide transition-all duration-300 ease-in-out hover:bg-accent-dark hover:shadow-lg;
+  }
+
+  .card {
+    @apply bg-white shadow-sm rounded-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-md;
+  }
+
+  .input-field {
+    @apply w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-accent transition-colors duration-300;
+  }
+
+  .section-title {
+    @apply text-3xl font-bold tracking-tight text-primary;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full;
+  }
+}
+
+/* Cart sidebar animation */
+.cart-enter {
+  transform: translateX(100%);
+}
+.cart-enter-active {
+  transform: translateX(0);
+  transition: transform 300ms ease;
+}
+.cart-exit {
+  transform: translateX(0);
+}
+.cart-exit-active {
+  transform: translateX(100%);
+  transition: transform 300ms ease;
+}

@@ -1,0 +1,149 @@
+import { useState } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { GoogleLogin } from '@react-oauth/google'
+import toast from 'react-hot-toast'
+import { useAuth } from '../context/AuthContext.jsx'
+
+export default function Login() {
+  const { login, googleLogin } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from?.pathname || '/'
+
+  const [formData, setFormData] = useState({ email: '', password: '' })
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState({})
+
+  const validate = () => {
+    const errs = {}
+    if (!formData.email) errs.email = 'Email is required'
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) errs.email = 'Invalid email'
+    if (!formData.password) errs.password = 'Password is required'
+    setErrors(errs)
+    return Object.keys(errs).length === 0
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!validate()) return
+    setLoading(true)
+    try {
+      await login(formData.email, formData.password)
+      toast.success('Welcome back!')
+      navigate(from, { replace: true })
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Invalid credentials')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      await googleLogin(credentialResponse.credential)
+      toast.success('Signed in with Google successfully!')
+      navigate(from, { replace: true })
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Google sign in failed')
+    }
+  }
+
+  return (
+    <div className="pt-[88px] min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-10">
+          <Link to="/">
+            <span className="text-primary font-black text-3xl tracking-[0.3em] uppercase">LUXE</span>
+          </Link>
+          <h1 className="text-2xl font-bold text-primary mt-4">Welcome Back</h1>
+          <p className="text-gray-500 text-sm mt-1">Sign in to your account</p>
+        </div>
+
+        <div className="bg-white p-8 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+            {/* Email */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Email</label>
+              <div className="relative">
+                <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={e => { setFormData(p => ({...p, email: e.target.value})); setErrors(p => ({...p, email: ''})) }}
+                  placeholder="your@email.com"
+                  className={`w-full pl-9 pr-4 py-3 border text-sm focus:outline-none focus:border-accent transition-colors ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
+                />
+              </div>
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+            </div>
+
+            {/* Password */}
+            <div>
+              <div className="flex justify-between mb-1.5">
+                <label className="text-xs font-semibold uppercase tracking-widest text-gray-600">Password</label>
+                <a href="#" className="text-xs text-accent hover:underline">Forgot password?</a>
+              </div>
+              <div className="relative">
+                <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={e => { setFormData(p => ({...p, password: e.target.value})); setErrors(p => ({...p, password: ''})) }}
+                  placeholder="Your password"
+                  className={`w-full pl-9 pr-11 py-3 border text-sm focus:outline-none focus:border-accent transition-colors ${errors.password ? 'border-red-400' : 'border-gray-200'}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(s => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary text-accent py-4 font-bold text-sm uppercase tracking-widest hover:bg-primary-light transition-colors disabled:opacity-60 mt-2"
+            >
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-3 text-gray-400 font-medium">Or continue with</span>
+            </div>
+          </div>
+
+          {/* Google Sign In */}
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => toast.error('Google Sign In was unsuccessful')}
+              theme="outline"
+              size="large"
+              text="continue_with"
+              shape="rectangular"
+              width="384"
+            />
+          </div>
+
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-accent font-semibold hover:underline">Create one</Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 import CartSidebar from './components/CartSidebar.jsx'
@@ -21,10 +21,13 @@ import AdminOrders from './pages/admin/AdminOrders.jsx'
 import AdminCategories from './pages/admin/AdminCategories.jsx'
 
 function App() {
+  const location = useLocation()
+  const isAdminRoute = location.pathname.startsWith('/admin')
+
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <CartSidebar />
+      {!isAdminRoute && <Navbar />}
+      {!isAdminRoute && <CartSidebar />}
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -43,7 +46,7 @@ function App() {
           </Route>
         </Routes>
       </main>
-      <Footer />
+      {!isAdminRoute && <Footer />}
     </div>
   )
 }

@@ -142,6 +142,10 @@ export default function Login() {
             Don't have an account?{' '}
             <Link to="/register" className="text-accent font-semibold hover:underline">Create one</Link>
           </p>
+
+          <div className="text-center mt-6 pt-4 border-t border-gray-100">
+            <span className="text-[11px] text-gray-400 font-mono">Version: 1.0.1</span>
+          </div>
         </div>
       </div>
     </div>

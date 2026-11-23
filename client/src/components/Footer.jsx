@@ -85,7 +85,12 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-white/40">
-          <span>© {new Date().getFullYear()} LUXE Fashion. All rights reserved.</span>
+          <div className="flex items-center gap-3">
+            <span>© {new Date().getFullYear()} LUXE Fashion. All rights reserved.</span>
+            <span className="bg-accent/20 text-accent border border-accent/30 px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider">
+              Version: 1.0.1
+            </span>
+          </div>
           <div className="flex gap-6">
             <a href="#" className="hover:text-accent transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-accent transition-colors">Terms of Service</a>

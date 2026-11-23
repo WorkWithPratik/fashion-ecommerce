@@ -74,8 +74,21 @@ export default function AdminProducts() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.name || !form.price || !form.stock || !form.categoryId) {
-      toast.error('Please fill all required fields'); return
+    if (!form.name.trim()) {
+      toast.error('Please enter Product Name')
+      return
+    }
+    if (!form.price || isNaN(form.price) || Number(form.price) <= 0) {
+      toast.error('Please enter a valid Price (e.g. 4495)')
+      return
+    }
+    if (!form.stock || isNaN(form.stock) || Number(form.stock) < 0) {
+      toast.error('Please enter Stock quantity (e.g. 25)')
+      return
+    }
+    if (!form.categoryId) {
+      toast.error('Please select a Category from the dropdown')
+      return
     }
     setSubmitting(true)
     try {

@@ -4,7 +4,8 @@ import toast from 'react-hot-toast'
 import api from '../../api/axios.js'
 import ImageDropzone from '../../components/ImageDropzone.jsx'
 
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+const CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+const SHOE_SIZES = ['UK 6', 'UK 7', 'UK 8', 'UK 9', 'UK 10', 'UK 11', 'UK 12']
 
 const EMPTY_FORM = {
   name: '', description: '', price: '', stock: '', categoryId: '',
@@ -286,20 +287,43 @@ export default function AdminProducts() {
               </div>
 
               {/* Sizes */}
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-widest text-gray-600 mb-2">Sizes</label>
-                <div className="flex flex-wrap gap-2">
-                  {SIZES.map(size => (
-                    <button
-                      type="button"
-                      key={size}
-                      onClick={() => handleSizeToggle(size)}
-                      className={`px-3 py-1.5 text-xs font-semibold border transition-all
-                        ${form.sizes.includes(size) ? 'bg-primary text-accent border-primary' : 'border-gray-200 text-gray-600 hover:border-primary'}`}
-                    >
-                      {size}
-                    </button>
-                  ))}
+              <div className="space-y-3">
+                <label className="block text-xs font-semibold uppercase tracking-widest text-gray-600">Available Sizes</label>
+                
+                {/* Clothing sizes */}
+                <div>
+                  <span className="text-[11px] text-gray-400 font-medium uppercase tracking-wider block mb-1.5">Apparel / Clothing:</span>
+                  <div className="flex flex-wrap gap-2">
+                    {CLOTHING_SIZES.map(size => (
+                      <button
+                        type="button"
+                        key={size}
+                        onClick={() => handleSizeToggle(size)}
+                        className={`px-3 py-1.5 text-xs font-semibold border transition-all
+                          ${form.sizes.includes(size) ? 'bg-primary text-accent border-primary shadow-sm' : 'border-gray-200 text-gray-600 hover:border-primary'}`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Shoe sizes */}
+                <div>
+                  <span className="text-[11px] text-gray-400 font-medium uppercase tracking-wider block mb-1.5">Footwear / Shoes (UK/IND):</span>
+                  <div className="flex flex-wrap gap-2">
+                    {SHOE_SIZES.map(size => (
+                      <button
+                        type="button"
+                        key={size}
+                        onClick={() => handleSizeToggle(size)}
+                        className={`px-3 py-1.5 text-xs font-semibold border transition-all
+                          ${form.sizes.includes(size) ? 'bg-primary text-accent border-primary shadow-sm' : 'border-gray-200 text-gray-600 hover:border-primary'}`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 

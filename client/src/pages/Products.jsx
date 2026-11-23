@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal, X, ChevronDown, ChevronUp } from 'lucide-rea
 import api from '../api/axios.js'
 import ProductCard from '../components/ProductCard.jsx'
 
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'UK 6', 'UK 7', 'UK 8', 'UK 9', 'UK 10', 'UK 11']
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest First' },
   { value: 'price_asc', label: 'Price: Low to High' },

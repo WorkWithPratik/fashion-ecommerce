@@ -41,5 +41,7 @@ services:
         source: /*
         destination: /index.html
     envVars:
+      - key: VITE_API_URL
+        value: https://fashion-ecommerce-api-qyt3.onrender.com
       - key: VITE_GOOGLE_CLIENT_ID
         sync: false

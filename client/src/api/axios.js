@@ -5,7 +5,7 @@ const getBaseURL = () => {
     return `${import.meta.env.VITE_API_URL}/api`;
   }
   if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
-    return 'https://fashion-ecommerce-api.onrender.com/api';
+    return 'https://fashion-ecommerce-api-qyt3.onrender.com/api';
   }
   return '/api';
 };

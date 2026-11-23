@@ -18,7 +18,8 @@ export function CartProvider({ children }) {
   const fetchCart = async () => {
     try {
       const { data } = await api.get('/cart')
-      setCartItems(data.items || [])
+      const items = Array.isArray(data) ? data : (data?.items || data?.cartItems || [])
+      setCartItems(items)
     } catch {
       setCartItems([])
     }
@@ -30,7 +31,7 @@ export function CartProvider({ children }) {
       return
     }
     try {
-      await api.post('/cart/add', { productId, quantity, size, color })
+      await api.post('/cart', { productId, quantity, size, color })
       await fetchCart()
       toast.success('Added to cart')
       setCartOpen(true)

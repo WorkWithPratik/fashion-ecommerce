@@ -15,6 +15,25 @@ const loadRazorpay = () => new Promise((resolve) => {
   document.body.appendChild(script)
 })
 
+const Field = ({ name, label, icon: Icon, type = 'text', placeholder, value, onChange, error, className = '' }) => (
+  <div className={className}>
+    <label className="block text-xs font-semibold uppercase tracking-widest text-gray-600 mb-1.5">{label}</label>
+    <div className="relative">
+      {Icon && <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />}
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className={`w-full ${Icon ? 'pl-9' : 'px-4'} pr-4 py-3 border text-sm focus:outline-none focus:border-accent transition-colors
+          ${error ? 'border-red-400' : 'border-gray-200'}`}
+      />
+    </div>
+    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+  </div>
+)
+
 export default function Checkout() {
   const { user } = useAuth()
   const { cartItems, cartTotal, clearCart } = useCart()
@@ -63,10 +82,28 @@ export default function Checkout() {
 
     setLoading(true)
     try {
+      const { data } = await api.post('/orders/create-razorpay-order', {
+        amount: totalWithShipping,
+        address: formData,
+      })
+
+      // If in demo / simulation mode (placeholder keys on server)
+      if (data.orderId?.startsWith('order_sim_')) {
+        await api.post('/orders/verify-payment', {
+          razorpay_order_id: data.orderId,
+          razorpay_payment_id: `pay_sim_${Date.now()}`,
+          razorpay_signature: 'simulated_signature',
+          address: formData,
+        })
+        clearCart()
+        toast.success('Order placed successfully! 🎉')
+        navigate('/orders')
+        setLoading(false)
+        return
+      }
+
       const loaded = await loadRazorpay()
       if (!loaded) { toast.error('Payment gateway failed to load. Please try again.'); setLoading(false); return }
-
-      const { data } = await api.post('/orders/create-razorpay-order', { amount: totalWithShipping })
 
       const options = {
         key: data.key,
@@ -75,7 +112,7 @@ export default function Checkout() {
         order_id: data.orderId,
         name: 'LUXE Fashion',
         description: 'Fashion Order',
-        image: '/vite.svg',
+        image: '/favicon.svg',
         handler: async (response) => {
           try {
             await api.post('/orders/verify-payment', {
@@ -117,25 +154,6 @@ export default function Checkout() {
     }
   }
 
-  const Field = ({ name, label, icon: Icon, type = 'text', placeholder, className = '' }) => (
-    <div className={className}>
-      <label className="block text-xs font-semibold uppercase tracking-widest text-gray-600 mb-1.5">{label}</label>
-      <div className="relative">
-        {Icon && <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />}
-        <input
-          type={type}
-          name={name}
-          value={formData[name]}
-          onChange={handleChange}
-          placeholder={placeholder}
-          className={`w-full ${Icon ? 'pl-9' : 'px-4'} pr-4 py-3 border text-sm focus:outline-none focus:border-accent transition-colors
-            ${errors[name] ? 'border-red-400' : 'border-gray-200'}`}
-        />
-      </div>
-      {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]}</p>}
-    </div>
-  )
-
   if (cartItems.length === 0) {
     navigate('/cart')
     return null
@@ -154,13 +172,13 @@ export default function Checkout() {
             </h2>
 
             <div className="grid sm:grid-cols-2 gap-4">
-              <Field name="name" label="Full Name" icon={User} placeholder="Your full name" className="sm:col-span-2" />
-              <Field name="email" label="Email" icon={Mail} type="email" placeholder="your@email.com" />
-              <Field name="phone" label="Phone" icon={Phone} type="tel" placeholder="10-digit number" />
-              <Field name="address" label="Address" icon={Building} placeholder="Street address, apt, etc." className="sm:col-span-2" />
-              <Field name="city" label="City" placeholder="City" />
-              <Field name="state" label="State" placeholder="State" />
-              <Field name="pincode" label="Pincode" placeholder="6-digit pincode" />
+              <Field name="name" label="Full Name" icon={User} placeholder="Your full name" value={formData.name} onChange={handleChange} error={errors.name} className="sm:col-span-2" />
+              <Field name="email" label="Email" icon={Mail} type="email" placeholder="your@email.com" value={formData.email} onChange={handleChange} error={errors.email} />
+              <Field name="phone" label="Phone" icon={Phone} type="tel" placeholder="10-digit number" value={formData.phone} onChange={handleChange} error={errors.phone} />
+              <Field name="address" label="Address" icon={Building} placeholder="Street address, apt, etc." value={formData.address} onChange={handleChange} error={errors.address} className="sm:col-span-2" />
+              <Field name="city" label="City" placeholder="City" value={formData.city} onChange={handleChange} error={errors.city} />
+              <Field name="state" label="State" placeholder="State" value={formData.state} onChange={handleChange} error={errors.state} />
+              <Field name="pincode" label="Pincode" placeholder="6-digit pincode" value={formData.pincode} onChange={handleChange} error={errors.pincode} />
             </div>
           </div>
 

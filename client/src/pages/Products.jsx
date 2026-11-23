@@ -62,7 +62,7 @@ export default function Products() {
 
       const { data } = await api.get(`/products?${params}`)
       setProducts(data.products || [])
-      setTotal(data.total || 0)
+      setTotal(data.total ?? data.pagination?.total ?? 0)
     } catch { setProducts([]) }
     finally { setLoading(false) }
   }, [page, sort, search, selectedCategories, selectedSizes, priceMin, priceMax])

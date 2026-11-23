@@ -225,25 +225,35 @@ router.delete('/products/:id', async (req, res) => {
 
 // ─── ORDERS ─────────────────────────────────────────────────────────────────
 
-// GET /api/admin/orders — all orders with user info and item count
+// GET /api/admin/orders — all orders with user info and item details
 router.get('/orders', async (req, res) => {
   try {
-    const { page = '1', limit = '20' } = req.query;
+    const { page = '1', limit = '20', status } = req.query;
     const pageNum = Math.max(1, parseInt(page, 10));
     const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10)));
     const skip = (pageNum - 1) * limitNum;
 
+    const where = {};
+    if (status) {
+      where.status = status;
+    }
+
     const [orders, total] = await Promise.all([
       prisma.order.findMany({
+        where,
         skip,
         take: limitNum,
         orderBy: { createdAt: 'desc' },
         include: {
           user: { select: { name: true, email: true } },
-          items: { select: { id: true } },
+          items: {
+            include: {
+              product: { select: { id: true, name: true, price: true, images: true } },
+            },
+          },
         },
       }),
-      prisma.order.count(),
+      prisma.order.count({ where }),
     ]);
 
     return res.json({

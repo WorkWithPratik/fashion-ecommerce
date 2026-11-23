@@ -18,8 +18,9 @@ export default function Orders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const { data } = await api.get('/orders/my-orders')
-        setOrders(data.orders || [])
+        const { data } = await api.get('/orders')
+        const orderList = Array.isArray(data) ? data : (data.orders || [])
+        setOrders(orderList)
       } catch { setOrders([]) }
       finally { setLoading(false) }
     }

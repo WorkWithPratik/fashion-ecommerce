@@ -34,8 +34,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST /api/cart — add or upsert a cart item
-router.post('/', async (req, res) => {
+// POST /api/cart or /api/cart/add — add or upsert a cart item
+router.post(['/', '/add'], async (req, res) => {
   try {
     const { productId, quantity = 1, size, color } = req.body;
 

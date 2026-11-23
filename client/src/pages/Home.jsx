@@ -4,29 +4,29 @@ import { ArrowRight, ChevronRight } from 'lucide-react'
 import api from '../api/axios.js'
 import ProductCard from '../components/ProductCard.jsx'
 
-const CATEGORIES = [
-  { name: 'Clothing', slug: 'clothing', emoji: '👕', desc: 'Latest styles & trends' },
-  { name: 'Shoes', slug: 'shoes', emoji: '👟', desc: 'Step up your game' },
-  { name: 'Accessories', slug: 'accessories', emoji: '💍', desc: 'Complete the look' },
-  { name: 'Bags', slug: 'bags', emoji: '👜', desc: 'Carry in style' },
-]
-
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([])
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchFeatured = async () => {
+    const fetchHomeData = async () => {
       try {
-        const { data } = await api.get('/products?limit=8&sort=newest')
-        setFeaturedProducts(data.products || [])
+        const [prodRes, catRes] = await Promise.all([
+          api.get('/products?limit=8&sort=newest').catch(() => ({ data: {} })),
+          api.get('/products/categories').catch(() => ({ data: {} })),
+        ])
+        setFeaturedProducts(prodRes.data.products || [])
+        const rawCats = catRes.data.categories || catRes.data || []
+        setCategories(Array.isArray(rawCats) ? rawCats : [])
       } catch {
         setFeaturedProducts([])
+        setCategories([])
       } finally {
         setLoading(false)
       }
     }
-    fetchFeatured()
+    fetchHomeData()
   }, [])
 
   return (
@@ -108,18 +108,27 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <Link
-              key={cat.slug}
+              key={cat.id || cat.slug}
               to={`/products?category=${cat.slug}`}
-              className="group relative bg-primary overflow-hidden aspect-[4/5] flex flex-col items-center justify-center hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+              className="group relative bg-primary overflow-hidden aspect-[4/5] flex flex-col items-center justify-end p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
             >
-              <div className="absolute inset-0 bg-accent/0 group-hover:bg-accent/10 transition-colors duration-300" />
-              <span className="text-5xl mb-3">{cat.emoji}</span>
-              <h3 className="text-white font-bold text-lg uppercase tracking-wider">{cat.name}</h3>
-              <p className="text-white/50 text-xs mt-1">{cat.desc}</p>
-              <div className="mt-4 flex items-center gap-1 text-accent text-xs font-semibold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                Shop Now <ChevronRight size={12} />
+              {cat.image ? (
+                <img
+                  src={cat.image}
+                  alt={cat.name}
+                  className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-75 group-hover:scale-105 transition-all duration-500"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-primary/60" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+              <div className="relative z-10 text-center w-full">
+                <h3 className="text-white font-bold text-lg uppercase tracking-wider">{cat.name}</h3>
+                <div className="mt-2 flex items-center justify-center gap-1 text-accent text-xs font-semibold uppercase tracking-widest opacity-90 group-hover:translate-x-1 transition-all">
+                  Shop Now <ChevronRight size={12} />
+                </div>
               </div>
             </Link>
           ))}

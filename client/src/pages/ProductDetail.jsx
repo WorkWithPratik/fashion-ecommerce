@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ShoppingBag, Heart, ChevronLeft, Minus, Plus, Check } from 'lucide-react'
+import { ShoppingBag, Heart, ChevronLeft, ChevronRight, Minus, Plus, Check, Play } from 'lucide-react'
 import api from '../api/axios.js'
 import { useCart } from '../context/CartContext.jsx'
+
+const isVideoUrl = (url = '') => {
+  return /\.(mp4|webm|mov)(\?.*)?$/i.test(url) || url.includes('/video/upload/')
+}
 
 export default function ProductDetail() {
   const { id } = useParams()
@@ -17,6 +21,8 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1)
   const [adding, setAdding] = useState(false)
   const [wishlist, setWishlist] = useState(false)
+  const [touchStart, setTouchStart] = useState(null)
+  const [touchEnd, setTouchEnd] = useState(null)
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -92,32 +98,108 @@ export default function ProductDetail() {
         </button>
 
         <div className="grid lg:grid-cols-2 gap-12">
-          {/* Image Gallery */}
+          {/* Image / Video Gallery with Touch Swipe */}
           <div className="space-y-3">
-            <div className="relative overflow-hidden bg-gray-100 aspect-[4/5]">
-              <img
-                src={images[mainImage]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
+            <div
+              className="relative overflow-hidden bg-gray-100 aspect-[4/5] select-none group"
+              onTouchStart={(e) => {
+                setTouchEnd(null)
+                setTouchStart(e.targetTouches[0].clientX)
+              }}
+              onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
+              onTouchEnd={() => {
+                if (!touchStart || !touchEnd) return
+                const dist = touchStart - touchEnd
+                if (dist > 50) setMainImage(p => (p + 1) % images.length)
+                else if (dist < -50) setMainImage(p => (p - 1 + images.length) % images.length)
+              }}
+            >
+              {isVideoUrl(images[mainImage]) ? (
+                <video
+                  src={images[mainImage]}
+                  controls
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <img
+                  src={images[mainImage]}
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-opacity duration-300"
+                />
+              )}
+
+              {/* Prev / Next Buttons */}
+              {images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setMainImage(p => (p - 1 + images.length) % images.length)}
+                    aria-label="Previous image"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-2 rounded-full transition-all opacity-80 md:opacity-0 md:group-hover:opacity-100"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMainImage(p => (p + 1) % images.length)}
+                    aria-label="Next image"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-2 rounded-full transition-all opacity-80 md:opacity-0 md:group-hover:opacity-100"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </>
+              )}
+
+              {/* Mobile Dots Indicator */}
+              {images.length > 1 && (
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                  {images.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setMainImage(i)}
+                      className={`h-2 rounded-full transition-all ${mainImage === i ? 'w-5 bg-accent' : 'w-2 bg-white/60'}`}
+                      aria-label={`Go to slide ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+
               {isOutOfStock && (
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
                   <span className="bg-white text-primary font-bold text-lg uppercase tracking-widest px-6 py-3">Sold Out</span>
                 </div>
               )}
             </div>
+
+            {/* Thumbnails */}
             {images.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-1">
-                {images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setMainImage(i)}
-                    className={`flex-shrink-0 w-20 h-24 overflow-hidden border-2 transition-all duration-200
-                      ${mainImage === i ? 'border-accent' : 'border-transparent hover:border-gray-300'}`}
-                  >
-                    <img src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
+                {images.map((img, i) => {
+                  const isVid = isVideoUrl(img)
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setMainImage(i)}
+                      className={`relative flex-shrink-0 w-20 h-24 overflow-hidden border-2 transition-all duration-200 bg-gray-100
+                        ${mainImage === i ? 'border-accent shadow-md' : 'border-transparent hover:border-gray-300'}`}
+                    >
+                      {isVid ? (
+                        <div className="w-full h-full relative bg-black flex items-center justify-center">
+                          <video src={img} className="w-full h-full object-cover opacity-70" muted playsInline />
+                          <Play size={16} className="absolute text-white" fill="white" />
+                        </div>
+                      ) : (
+                        <img src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
+                      )}
+                    </button>
+                  )
+                })}
               </div>
             )}
           </div>

@@ -13,10 +13,18 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: {
-    folder: 'fashion-ecom',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 800, height: 1000, crop: 'limit', quality: 'auto' }],
+  params: async (_req, file) => {
+    const isVideo = file.mimetype.startsWith('video');
+    return {
+      folder: 'fashion-ecom',
+      resource_type: isVideo ? 'video' : 'image',
+      allowed_formats: isVideo
+        ? ['mp4', 'webm', 'mov']
+        : ['jpg', 'jpeg', 'png', 'webp'],
+      ...(isVideo
+        ? {}
+        : { transformation: [{ width: 1200, height: 1500, crop: 'limit', quality: 'auto' }] }),
+    };
   },
 });
 

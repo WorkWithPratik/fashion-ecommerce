@@ -86,19 +86,30 @@ router.post('/products', upload.array('images', 5), async (req, res) => {
   try {
     const { name, description, price, stock, categoryId, sizes, colors } = req.body;
 
-    if (!name || !description || !price || !categoryId) {
-      return res.status(400).json({ message: 'name, description, price, and categoryId are required.' });
+    if (!name || !price || !categoryId) {
+      return res.status(400).json({ message: 'Name, price, and category are required.' });
     }
 
     const imageUrls = req.files ? req.files.map((f) => f.path) : [];
 
-    const parsedSizes = sizes ? (Array.isArray(sizes) ? sizes : JSON.parse(sizes)) : [];
-    const parsedColors = colors ? (Array.isArray(colors) ? colors : JSON.parse(colors)) : [];
+    let parsedSizes = [];
+    try {
+      parsedSizes = typeof sizes === 'string' ? JSON.parse(sizes) : (Array.isArray(sizes) ? sizes : []);
+    } catch {
+      parsedSizes = typeof sizes === 'string' ? sizes.split(',').map(s => s.trim()).filter(Boolean) : [];
+    }
+
+    let parsedColors = [];
+    try {
+      parsedColors = typeof colors === 'string' ? JSON.parse(colors) : (Array.isArray(colors) ? colors : []);
+    } catch {
+      parsedColors = typeof colors === 'string' ? colors.split(',').map(c => c.trim()).filter(Boolean) : [];
+    }
 
     const product = await prisma.product.create({
       data: {
         name,
-        description,
+        description: description || '',
         price: parseFloat(price),
         stock: parseInt(stock, 10) || 0,
         images: imageUrls,
@@ -152,8 +163,20 @@ router.put('/products/:id', upload.array('images', 5), async (req, res) => {
     if (price) updateData.price = parseFloat(price);
     if (stock !== undefined) updateData.stock = parseInt(stock, 10);
     if (categoryId) updateData.categoryId = categoryId;
-    if (sizes) updateData.sizes = Array.isArray(sizes) ? sizes : JSON.parse(sizes);
-    if (colors) updateData.colors = Array.isArray(colors) ? colors : JSON.parse(colors);
+    if (sizes) {
+      try {
+        updateData.sizes = typeof sizes === 'string' ? JSON.parse(sizes) : sizes;
+      } catch {
+        updateData.sizes = typeof sizes === 'string' ? sizes.split(',').map(s => s.trim()).filter(Boolean) : [];
+      }
+    }
+    if (colors) {
+      try {
+        updateData.colors = typeof colors === 'string' ? JSON.parse(colors) : colors;
+      } catch {
+        updateData.colors = typeof colors === 'string' ? colors.split(',').map(c => c.trim()).filter(Boolean) : [];
+      }
+    }
 
     const updated = await prisma.product.update({
       where: { id },

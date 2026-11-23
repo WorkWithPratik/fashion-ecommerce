@@ -4,6 +4,7 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { GoogleLogin } from '@react-oauth/google'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext.jsx'
+import { APP_VERSION } from '../version.js'
 
 export default function Login() {
   const { login, googleLogin } = useAuth()
@@ -144,7 +145,7 @@ export default function Login() {
           </p>
 
           <div className="text-center mt-6 pt-4 border-t border-gray-100">
-            <span className="text-[11px] text-gray-400 font-mono">Version: 1.0.1</span>
+            <span className="text-[11px] text-gray-400 font-mono">Version: {APP_VERSION}</span>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Instagram, Twitter, Facebook, Mail } from 'lucide-react'
+import { APP_VERSION } from '../version.js'
 
 export default function Footer() {
   return (
@@ -88,7 +89,7 @@ export default function Footer() {
           <div className="flex items-center gap-3">
             <span>© {new Date().getFullYear()} LUXE Fashion. All rights reserved.</span>
             <span className="bg-accent/20 text-accent border border-accent/30 px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider">
-              Version: 1.0.1
+              Version: {APP_VERSION}
             </span>
           </div>
           <div className="flex gap-6">
